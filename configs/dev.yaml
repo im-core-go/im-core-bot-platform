@@ -5,10 +5,6 @@ mysql_conf:
   port: 3306
   database: "web_chat"
 
-llm_request_conf:
-  base_url: "https://api.qhaigc.net/v1/chat/completions"
-  img_url: "https://api.qhaigc.net/v1/images/generations"
-
 redis_conf:
   addr: "localhost:6379"
   password: ""
