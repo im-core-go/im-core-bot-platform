@@ -3,6 +3,7 @@ package infra
 import (
 	"fmt"
 	"web-chat/configs"
+	"web-chat/internal/model"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -21,5 +22,6 @@ func newMysql(cfg configs.Config) *gorm.DB {
 	if err != nil {
 		panic("failed to connect database")
 	}
+	db.AutoMigrate(&model.User{})
 	return db
 }
