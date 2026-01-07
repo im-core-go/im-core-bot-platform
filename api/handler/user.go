@@ -73,7 +73,7 @@ func (h *UserHandler) Update(c *gin.Context) {
 		Respond(c, 401, errcode.CodeUnauthorized, "unauthorized", nil)
 		return
 	}
-	id, ok := userID.(int64)
+	id, ok := userID.(string)
 	if !ok {
 		Respond(c, 401, errcode.CodeUnauthorized, "invalid user", nil)
 		return

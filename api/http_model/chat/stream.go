@@ -10,8 +10,10 @@ const (
 )
 
 type StreamEvent struct {
-	Type  StreamEventType `json:"type"`
-	Delta string          `json:"delta,omitempty"`
+	Type           StreamEventType `json:"type"`
+	Delta          string          `json:"delta,omitempty"`
+	ConversationID string          `json:"conversation_id,omitempty"`
+	Title          string          `json:"title,omitempty"`
 }
 
 type MessageSteam interface {

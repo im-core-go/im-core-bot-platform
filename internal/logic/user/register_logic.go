@@ -36,6 +36,11 @@ func (l *logicImpl) Register(req *http_model.UserRegisterReq) error {
 		}
 		entity.Email = *req.Email
 	}
+<<<<<<< Updated upstream
+=======
+	entity.UUID = l.svcCtx.Utils.UUID.New()
+	entity.Email = req.Email
+>>>>>>> Stashed changes
 	entity.Password = string(hash)
 	entity.NickName = req.NickName
 

@@ -17,13 +17,13 @@ func (u *userDaoImpl) CreateUser(user model.User) error {
 	return u.db.Create(&user).Error
 }
 
-func (u *userDaoImpl) UpdateUser(id int64, updateMap map[string]interface{}) error {
-	return u.db.Model(&model.User{}).Where("id = ?", id).Updates(updateMap).Error
+func (u *userDaoImpl) UpdateUser(uuid string, updateMap map[string]interface{}) error {
+	return u.db.Model(&model.User{}).Where("uuid = ?", uuid).Updates(updateMap).Error
 }
 
-func (u *userDaoImpl) GetUserByID(id int64) (*model.User, error) {
+func (u *userDaoImpl) GetUserByID(uuid string) (*model.User, error) {
 	var entity model.User
-	if err := u.db.First(&entity, id).Error; err != nil {
+	if err := u.db.Where("uuid = ?", uuid).First(&entity).Error; err != nil {
 		return nil, err
 	}
 	return &entity, nil

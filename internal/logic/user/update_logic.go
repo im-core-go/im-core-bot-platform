@@ -8,8 +8,8 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func (l *logicImpl) Update(userID int64, req *http_model.UserUpdateReq) error {
-	if userID == 0 {
+func (l *logicImpl) Update(userID string, req *http_model.UserUpdateReq) error {
+	if userID == "" {
 		return fmt.Errorf("user id is required")
 	}
 	if req == nil {
