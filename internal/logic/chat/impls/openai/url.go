@@ -10,6 +10,6 @@ func newURLs(baseURL string) *urls {
 	return &urls{
 		BaseURL:    baseURL,
 		ModelList:  baseURL + "/models",
-		Completion: baseURL + "/responses",
+		Completion: baseURL + "/chat/completions",
 	}
 }

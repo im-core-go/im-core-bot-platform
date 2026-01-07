@@ -65,6 +65,7 @@ func NewChatLogic(svcCtx *svc.Context) (chat.Logic, error) {
 	}
 	headers := map[string]string{
 		"Authorization": "Bearer " + key,
+		"Content-Type":  "application/json",
 	}
 	return &logicImpl{
 		svcCtx:  svcCtx,
@@ -104,9 +105,6 @@ func (l *logicImpl) ResponseStream(ctx context.Context, req *httpmodel.Completio
 	if err != nil {
 		return nil, "", err
 	}
-<<<<<<< Updated upstream
-	return newOpenAIResponsesStream(sr), nil
-=======
 
 	promptMessages, err := l.memory.BuildPrompt(ctx, req.ConversationID, userMsg, req.Model, func(ctx context.Context, modelName string, messages []memory.PromptMessage) (string, error) {
 		return l.doCompletionFromPrompt(ctx, modelName, messages)
@@ -133,7 +131,6 @@ func (l *logicImpl) ResponseStream(ctx context.Context, req *httpmodel.Completio
 	})
 	l.setStreamContext(req.ConversationID, streamWithStore)
 	return streamWithStore, req.ConversationID, nil
->>>>>>> Stashed changes
 }
 
 func (l *logicImpl) PullModules(ctx context.Context) (*httpmodel.ModelListResp, error) {

@@ -1,6 +1,7 @@
 package user
 
 import (
+	"context"
 	"fmt"
 	"web-chat/api/http_model"
 	"web-chat/internal/model"
@@ -16,6 +17,18 @@ func (l *logicImpl) Register(req *http_model.UserRegisterReq) error {
 		entity model.User
 	)
 	lgr := logger.L()
+	if ok, err = l.svcCtx.Utils.Regexp.ValidateEmail(req.Email); !ok || err != nil {
+		lgr.Errorf("register email invalid: %v", err)
+		return fmt.Errorf("email is invalid")
+	}
+	ok, err = l.svcCtx.Utils.Code.VerifyCode(context.Background(), req.EmailCode, req.Email)
+	if err != nil {
+		lgr.Errorf("register verify code error: %v", err)
+		return err
+	}
+	if !ok {
+		return fmt.Errorf("email code is invalid")
+	}
 	hash, err := bcrypt.GenerateFromPassword(
 		[]byte(req.Password),
 		bcrypt.DefaultCost,
@@ -24,23 +37,16 @@ func (l *logicImpl) Register(req *http_model.UserRegisterReq) error {
 		lgr.Errorf("register hash error: %v", err)
 		return err
 	}
-	if ok, err = l.svcCtx.Utils.Regexp.ValidatePhone(req.Phone); !ok || err != nil {
-		lgr.Errorf("register phone invalid: %v", err)
-		return fmt.Errorf("phone number is invalid")
-	}
-	entity.Phone = req.Phone
-	if req.Email != nil {
-		if ok, err = l.svcCtx.Utils.Regexp.ValidateEmail(*req.Email); !ok || err != nil {
-			lgr.Errorf("register email invalid: %v", err)
-			return fmt.Errorf("email is invalid")
+	if req.Phone != nil && *req.Phone != "" {
+		if ok, err = l.svcCtx.Utils.Regexp.ValidatePhone(*req.Phone); !ok || err != nil {
+			lgr.Errorf("register phone invalid: %v", err)
+			return fmt.Errorf("phone number is invalid")
 		}
-		entity.Email = *req.Email
+		entity.Phone = req.Phone
 	}
-<<<<<<< Updated upstream
-=======
 	entity.UUID = l.svcCtx.Utils.UUID.New()
 	entity.Email = req.Email
->>>>>>> Stashed changes
+
 	entity.Password = string(hash)
 	entity.NickName = req.NickName
 

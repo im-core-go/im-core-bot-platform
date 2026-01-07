@@ -1,6 +1,7 @@
 package user
 
 import (
+	"context"
 	"fmt"
 	"time"
 	"web-chat/api/http_model"
@@ -46,8 +47,6 @@ func (l *logicImpl) Login(req *http_model.LoginReq) (string, error) {
 	return token, nil
 }
 
-<<<<<<< Updated upstream
-=======
 func (l *logicImpl) LoginByCode(req *http_model.LoginCodeReq) (string, error) {
 	if req == nil {
 		return "", fmt.Errorf("login request is nil")
@@ -79,7 +78,7 @@ func (l *logicImpl) LoginByCode(req *http_model.LoginCodeReq) (string, error) {
 		return "", err
 	}
 	claim := auth.UserClaim{
-		UserID: entity.UUID,
+		UserID: entity.ID,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(authTokenTTL).Unix(),
 			IssuedAt:  time.Now().Unix(),
@@ -93,7 +92,6 @@ func (l *logicImpl) LoginByCode(req *http_model.LoginCodeReq) (string, error) {
 	return token, nil
 }
 
->>>>>>> Stashed changes
 type authUser struct {
 	UUID     string
 	Password string
