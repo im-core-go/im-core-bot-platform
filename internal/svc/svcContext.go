@@ -1,11 +1,11 @@
 package svc
 
 import (
-	"web-chat/configs"
-	"web-chat/internal/dao"
-	"web-chat/pkg/auth"
-	"web-chat/pkg/infra"
-	"web-chat/pkg/utils"
+	"github.com/im-core-go/im-core-bot-platform/configs"
+	"github.com/im-core-go/im-core-bot-platform/internal/dao"
+	"github.com/im-core-go/im-core-bot-platform/pkg/auth"
+	"github.com/im-core-go/im-core-bot-platform/pkg/infra"
+	"github.com/im-core-go/im-core-bot-platform/pkg/utils"
 )
 
 type Context struct {

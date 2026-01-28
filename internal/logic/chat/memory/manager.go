@@ -2,7 +2,7 @@ package memory
 
 import (
 	"context"
-	"web-chat/internal/model"
+	"github.com/im-core-go/im-core-bot-platform/internal/model"
 )
 
 type PromptMessage struct {

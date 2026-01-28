@@ -6,10 +6,10 @@ import (
 	_ "embed"
 	"errors"
 	"fmt"
+	"github.com/im-core-go/im-core-bot-platform/pkg/logger"
+	"github.com/im-core-go/im-core-bot-platform/pkg/mail"
+	"github.com/im-core-go/im-core-bot-platform/pkg/sms"
 	"math/big"
-	"web-chat/pkg/logger"
-	"web-chat/pkg/mail"
-	"web-chat/pkg/sms"
 
 	"github.com/redis/go-redis/v9"
 )

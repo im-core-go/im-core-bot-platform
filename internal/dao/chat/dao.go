@@ -1,6 +1,6 @@
 package chat
 
-import "web-chat/internal/model"
+import "github.com/im-core-go/im-core-bot-platform/internal/model"
 
 type Dao interface {
 	CreateConversation(conversation model.Conversation) error

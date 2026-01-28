@@ -1,8 +1,8 @@
 package openai
 
 import (
+	"github.com/im-core-go/im-core-bot-platform/internal/logic/chat"
 	"sync"
-	httpmodel "web-chat/api/http_model/chat"
 )
 
 type streamContext struct {
@@ -23,7 +23,7 @@ func (s *streamContext) getTitle() string {
 	return s.title
 }
 
-func (l *logicImpl) setStreamContext(conversationID string, stream httpmodel.MessageSteam) {
+func (l *logicImpl) setStreamContext(conversationID string, stream chat.MessageStream) {
 	ps, ok := stream.(*persistedStream)
 	if !ok {
 		return
@@ -31,7 +31,7 @@ func (l *logicImpl) setStreamContext(conversationID string, stream httpmodel.Mes
 	ps.ctx = &streamContext{conversationID: conversationID}
 }
 
-func (l *logicImpl) setStreamTitle(stream httpmodel.MessageSteam, title string) {
+func (l *logicImpl) setStreamTitle(stream chat.MessageStream, title string) {
 	ps, ok := stream.(*persistedStream)
 	if !ok || ps.ctx == nil {
 		return

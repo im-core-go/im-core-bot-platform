@@ -6,16 +6,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/im-core-go/im-core-bot-platform/internal/logic/chat"
+	"github.com/im-core-go/im-core-bot-platform/internal/logic/chat/memory"
+	"github.com/im-core-go/im-core-bot-platform/internal/svc"
+	http2 "github.com/im-core-go/im-core-bot-platform/pkg/http"
+	"github.com/im-core-go/im-core-bot-platform/pkg/logger"
+	"github.com/im-core-go/im-core-bot-platform/pkg/utils"
 	"net/http"
 	"os"
 	"strings"
-	httpmodel "web-chat/api/http_model/chat"
-	"web-chat/internal/logic/chat"
-	"web-chat/internal/logic/chat/memory"
-	"web-chat/internal/svc"
-	http2 "web-chat/pkg/http"
-	"web-chat/pkg/logger"
-	"web-chat/pkg/utils"
 )
 
 type logicImpl struct {
@@ -81,7 +80,7 @@ func NewChatLogic(svcCtx *svc.Context) (chat.Logic, error) {
 	}, nil
 }
 
-func (l *logicImpl) ResponseStream(ctx context.Context, req *httpmodel.Completion, userID string) (httpmodel.MessageSteam, string, error) {
+func (l *logicImpl) ResponseStream(ctx context.Context, req *chat.Completion, userID string) (chat.MessageStream, string, error) {
 	if req.Model == "" {
 		return nil, "", errors.New("missing model")
 	}
@@ -126,7 +125,7 @@ func (l *logicImpl) ResponseStream(ctx context.Context, req *httpmodel.Completio
 	}
 
 	stream := newOpenAIChatCompletionsStream(sr)
-	var streamWithStore httpmodel.MessageSteam
+	var streamWithStore chat.MessageStream
 	streamWithStore = newPersistedStream(stream, func(content string) error {
 		if err := l.memory.SaveAssistantMessage(ctx, req.ConversationID, content); err != nil {
 			return err
@@ -140,9 +139,9 @@ func (l *logicImpl) ResponseStream(ctx context.Context, req *httpmodel.Completio
 	return streamWithStore, req.ConversationID, nil
 }
 
-func (l *logicImpl) PullModules(ctx context.Context) (*httpmodel.ModelListResp, error) {
+func (l *logicImpl) PullModules(ctx context.Context) (*chat.ModelListResp, error) {
 	var (
-		res = new(httpmodel.ModelListResp)
+		res = new(chat.ModelListResp)
 		err error
 	)
 
@@ -166,7 +165,7 @@ func (l *logicImpl) PullModules(ctx context.Context) (*httpmodel.ModelListResp, 
 	return res, nil
 }
 
-func (l *logicImpl) CreateConversation(ctx context.Context, req *httpmodel.CreateConversationReq, userID string) (*httpmodel.CreateConversationResp, error) {
+func (l *logicImpl) CreateConversation(ctx context.Context, req *chat.CreateConversationReq, userID string) (*chat.CreateConversationResp, error) {
 	if req.Model == "" {
 		return nil, errors.New("missing model")
 	}
@@ -208,10 +207,10 @@ func (l *logicImpl) CreateConversation(ctx context.Context, req *httpmodel.Creat
 
 	l.generateTitleAsync(conversationID, req.Model)
 
-	return &httpmodel.CreateConversationResp{
+	return &chat.CreateConversationResp{
 		ConversationID: conversationID,
 		Title:          "New",
-		Reply: httpmodel.Message{
+		Reply: chat.Message{
 			Role:        "assistant",
 			ContentType: "text",
 			Content:     reply,
@@ -219,7 +218,7 @@ func (l *logicImpl) CreateConversation(ctx context.Context, req *httpmodel.Creat
 	}, nil
 }
 
-func (l *logicImpl) ListConversations(ctx context.Context, req *httpmodel.ListConversationsReq, userID string) (*httpmodel.ListConversationsResp, error) {
+func (l *logicImpl) ListConversations(ctx context.Context, req *chat.ListConversationsReq, userID string) (*chat.ListConversationsResp, error) {
 	if userID == "" {
 		return nil, errors.New("missing user")
 	}
@@ -230,16 +229,16 @@ func (l *logicImpl) ListConversations(ctx context.Context, req *httpmodel.ListCo
 	if err != nil {
 		return nil, err
 	}
-	respItems := make([]httpmodel.ConversationItem, 0, len(items))
+	respItems := make([]chat.ConversationItem, 0, len(items))
 	for _, item := range items {
-		respItems = append(respItems, httpmodel.ConversationItem{
+		respItems = append(respItems, chat.ConversationItem{
 			ConversationID: item.UUID,
 			Title:          item.Title,
 			CreatedAt:      item.CreatedAt,
 			UpdatedAt:      item.UpdatedAt,
 		})
 	}
-	return &httpmodel.ListConversationsResp{
+	return &chat.ListConversationsResp{
 		Total:    total,
 		Page:     page,
 		PageSize: pageSize,
@@ -247,7 +246,7 @@ func (l *logicImpl) ListConversations(ctx context.Context, req *httpmodel.ListCo
 	}, nil
 }
 
-func (l *logicImpl) ListMessages(ctx context.Context, req *httpmodel.ListMessagesReq, userID string) (*httpmodel.ListMessagesResp, error) {
+func (l *logicImpl) ListMessages(ctx context.Context, req *chat.ListMessagesReq, userID string) (*chat.ListMessagesResp, error) {
 	if userID == "" {
 		return nil, errors.New("missing user")
 	}
@@ -269,13 +268,13 @@ func (l *logicImpl) ListMessages(ctx context.Context, req *httpmodel.ListMessage
 	if err != nil {
 		return nil, err
 	}
-	respItems := make([]httpmodel.MessageItem, 0, len(items))
+	respItems := make([]chat.MessageItem, 0, len(items))
 	for _, item := range items {
 		meta := ""
 		if item.Meta != nil {
 			meta = *item.Meta
 		}
-		respItems = append(respItems, httpmodel.MessageItem{
+		respItems = append(respItems, chat.MessageItem{
 			ID:          item.ID,
 			Sequence:    item.Sequence,
 			Role:        item.Role,
@@ -286,7 +285,7 @@ func (l *logicImpl) ListMessages(ctx context.Context, req *httpmodel.ListMessage
 			CreatedAt:   item.CreatedAt,
 		})
 	}
-	return &httpmodel.ListMessagesResp{
+	return &chat.ListMessagesResp{
 		Total:    total,
 		Page:     page,
 		PageSize: pageSize,
@@ -294,7 +293,7 @@ func (l *logicImpl) ListMessages(ctx context.Context, req *httpmodel.ListMessage
 	}, nil
 }
 
-func (l *logicImpl) GetConversation(ctx context.Context, req *httpmodel.GetConversationReq, userID string) (*httpmodel.ConversationItem, error) {
+func (l *logicImpl) GetConversation(ctx context.Context, req *chat.GetConversationReq, userID string) (*chat.ConversationItem, error) {
 	if req.ConversationID == "" {
 		return nil, errors.New("missing conversation_id")
 	}
@@ -305,7 +304,7 @@ func (l *logicImpl) GetConversation(ctx context.Context, req *httpmodel.GetConve
 	if userID != "" && conversation.UserID != userID {
 		return nil, errors.New("forbidden")
 	}
-	return &httpmodel.ConversationItem{
+	return &chat.ConversationItem{
 		ConversationID: conversation.UUID,
 		Title:          conversation.Title,
 		CreatedAt:      conversation.CreatedAt,
@@ -313,7 +312,7 @@ func (l *logicImpl) GetConversation(ctx context.Context, req *httpmodel.GetConve
 	}, nil
 }
 
-func (l *logicImpl) UpdateConversationTitle(ctx context.Context, req *httpmodel.UpdateConversationTitleReq, userID string) error {
+func (l *logicImpl) UpdateConversationTitle(ctx context.Context, req *chat.UpdateConversationTitleReq, userID string) error {
 	if req.ConversationID == "" {
 		return errors.New("missing conversation_id")
 	}
@@ -330,7 +329,7 @@ func (l *logicImpl) UpdateConversationTitle(ctx context.Context, req *httpmodel.
 	return l.memory.UpdateConversationTitle(ctx, req.ConversationID, req.Title)
 }
 
-func (l *logicImpl) DeleteConversation(ctx context.Context, req *httpmodel.DeleteConversationReq, userID string) error {
+func (l *logicImpl) DeleteConversation(ctx context.Context, req *chat.DeleteConversationReq, userID string) error {
 	if req.ConversationID == "" {
 		return errors.New("missing conversation_id")
 	}
@@ -347,7 +346,7 @@ func (l *logicImpl) DeleteConversation(ctx context.Context, req *httpmodel.Delet
 	return l.memory.DeleteConversation(ctx, req.ConversationID)
 }
 
-func (l *logicImpl) ClearMessages(ctx context.Context, req *httpmodel.ClearMessagesReq, userID string) error {
+func (l *logicImpl) ClearMessages(ctx context.Context, req *chat.ClearMessagesReq, userID string) error {
 	if req.ConversationID == "" {
 		return errors.New("missing conversation_id")
 	}

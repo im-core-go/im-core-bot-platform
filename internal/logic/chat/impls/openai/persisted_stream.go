@@ -1,31 +1,31 @@
 package openai
 
 import (
+	"github.com/im-core-go/im-core-bot-platform/internal/logic/chat"
 	"strings"
-	httpmodel "web-chat/api/http_model/chat"
 )
 
 type persistedStream struct {
-	inner      httpmodel.MessageSteam
+	inner      chat.MessageStream
 	onComplete func(content string) error
 	builder    strings.Builder
 	done       bool
 	ctx        *streamContext
 }
 
-func newPersistedStream(inner httpmodel.MessageSteam, onComplete func(content string) error) httpmodel.MessageSteam {
+func newPersistedStream(inner chat.MessageStream, onComplete func(content string) error) chat.MessageStream {
 	return &persistedStream{
 		inner:      inner,
 		onComplete: onComplete,
 	}
 }
 
-func (p *persistedStream) Next() (httpmodel.StreamEvent, bool, error) {
+func (p *persistedStream) Next() (chat.StreamEvent, bool, error) {
 	ev, done, err := p.inner.Next()
 	if err != nil {
 		return ev, done, err
 	}
-	if ev.Type == httpmodel.EventTextDelta {
+	if ev.Type == chat.EventTextDelta {
 		p.builder.WriteString(ev.Delta)
 	}
 	if done {

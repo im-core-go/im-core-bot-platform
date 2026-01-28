@@ -3,10 +3,10 @@ package memory
 import (
 	"context"
 	"errors"
+	"github.com/im-core-go/im-core-bot-platform/internal/dao/chat"
+	"github.com/im-core-go/im-core-bot-platform/internal/model"
 	"strings"
 	"time"
-	"web-chat/internal/dao/chat"
-	"web-chat/internal/model"
 
 	"gorm.io/gorm"
 )

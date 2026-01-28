@@ -1,10 +1,10 @@
 package utils
 
 import (
-	"web-chat/pkg/code"
-	"web-chat/pkg/http"
-	"web-chat/pkg/regexp"
-	"web-chat/pkg/uuid"
+	"github.com/im-core-go/im-core-bot-platform/pkg/code"
+	"github.com/im-core-go/im-core-bot-platform/pkg/http"
+	"github.com/im-core-go/im-core-bot-platform/pkg/regexp"
+	"github.com/im-core-go/im-core-bot-platform/pkg/uuid"
 
 	"github.com/bwmarrin/snowflake"
 	"github.com/redis/go-redis/v9"

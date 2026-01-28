@@ -1,7 +1,7 @@
 package infra
 
 import (
-	"web-chat/configs"
+	"github.com/im-core-go/im-core-bot-platform/configs"
 
 	"github.com/redis/go-redis/v9"
 )

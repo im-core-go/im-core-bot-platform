@@ -1,7 +1,7 @@
 package chat
 
 import (
-	"web-chat/internal/model"
+	"github.com/im-core-go/im-core-bot-platform/internal/model"
 
 	"gorm.io/gorm"
 )

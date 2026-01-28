@@ -3,10 +3,10 @@ package openai
 import (
 	"encoding/json"
 	"errors"
+	"github.com/im-core-go/im-core-bot-platform/internal/logic/chat"
+	http2 "github.com/im-core-go/im-core-bot-platform/pkg/http"
+	"github.com/im-core-go/im-core-bot-platform/pkg/logger"
 	"strings"
-	"web-chat/api/http_model/chat"
-	http2 "web-chat/pkg/http"
-	"web-chat/pkg/logger"
 )
 
 type chatCompletionsStream struct {
